@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Threading.Tasks;
 
 namespace CollatzCalculator
 {
@@ -14,41 +15,45 @@ namespace CollatzCalculator
             _values = new DataStore();
             _values.Set(1, 4);
 
-            ulong i = 1;
+            long i = 1;
 
             try
             {
 
-                for (i = 2; i <= int.MaxValue; i++)
+                Parallel.For(2, int.MaxValue, (i) =>
                 {
                     Operate(i);
                     Console.WriteLine(i);
-                }
+                });
 
             }
-            catch (IndexOutOfRangeException ex)
+            catch (IndexOutOfRangeException)
             {
                 Console.WriteLine($"Out of Range based off {i}");
+            }
+            catch (StackOverflowException)
+            {
+                Console.WriteLine($"Stack overflow based off {i}");
             }
 
             Console.ReadLine();
         }
 
-        static void Operate(ulong value)
+        static void Operate(long value)
         {
             //already set
-            if (_values.Get(value) != default)
+            if (_values.Get(value) != default || value == 1)
             {
                 return;
             }
 
             try
             {
-                ulong nextValue;
+                long nextValue;
 
                 //Event
                 if (value % 2 == 0)
-                    nextValue = value / 2l;
+                    nextValue = value / 2L;
                 else
                     nextValue = (value * 3) + 1;
 
@@ -65,29 +70,31 @@ namespace CollatzCalculator
 
     public class DataStore
     {
-        const int _maxIndex = 0X7FEFFFFF;
-        ulong[][] _store = new ulong[_maxIndex][];
+        //const int _maxIndex = 0X7FEFFFFF;
+        //ulong[][] _store = new ulong[_maxIndex][];
 
-        public ulong Get(ulong i)
+        public ulong Get(long i)
         {
-            var two = (i % _maxIndex);
-            var one = (two == i ? 0 : (i - two) / _maxIndex);
+            return default;
 
-            if (_store[one] == null)
-                return default;
+            //var two = (i % _maxIndex);
+            //var one = (two == i ? 0 : (i - two) / _maxIndex);
 
-            return _store[one][two];
+            //if (_store[one] == null)
+            //    return default;
+
+            //return _store[one][two];
         }
 
-        public void Set(ulong i, ulong value)
+        public void Set(long i, long value)
         {
-            var two = (i % _maxIndex);
-            var one = (two == i ? 0 : (i - two) / _maxIndex);
+            //var two = (i % _maxIndex);
+            //var one = (two == i ? 0 : (i - two) / _maxIndex);
 
-            if (_store[one] == null)
-                _store[one] = new ulong[_maxIndex];
+            //if (_store[one] == null)
+            //    _store[one] = new ulong[_maxIndex];
 
-            _store[one][two] = value;
+            //_store[one][two] = value;
         }
     }
 }
